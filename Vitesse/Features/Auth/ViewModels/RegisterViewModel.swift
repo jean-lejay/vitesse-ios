@@ -11,24 +11,36 @@ import Combine
 @MainActor
 final class RegisterViewModel: ObservableObject {
     
-    @Published var errorMessage: String?
-    @Published var isLoading = false
+    @Published private(set) var errorMessage: String?
+    @Published private(set) var isLoading = false
+    @Published private(set) var isRegistrationSuccessful = false
     
-    private let authRepository = AuthRepository()
+    private let authRepository: AuthRepositoryProtocol
+    
+    init(authRepository: AuthRepositoryProtocol) {
+        self.authRepository = authRepository
+    }
  
-    func register(candidateDetail: RegisterUserRequestDTO) async {
+    func register(formData: RegisterFormData) async {
         isLoading = true
         errorMessage = nil
+        isRegistrationSuccessful = false
+        
+        defer {
+            isLoading = false
+        }
         
         do {
-            try await authRepository.createAccount(candidateDetail: candidateDetail)
+            let request = formData.toDTO()
+            try await authRepository.createAccount(request: request)
+            isRegistrationSuccessful = true
             
         } catch APIError.invalidStatusCode(_, let message) {
             errorMessage = message ?? "Account creation failed"
         } catch {
             errorMessage = "Account creation failed"
         }
-        isLoading = false
+        
     }
     
 }

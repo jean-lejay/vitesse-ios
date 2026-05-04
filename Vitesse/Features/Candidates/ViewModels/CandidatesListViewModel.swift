@@ -1,5 +1,5 @@
 //
-//  TestBackendViewModel.swift
+//  CandidatesListViewModel.swift
 //  Vitesse
 //
 //  Created by Jean Lejay on 4/23/26.
@@ -8,87 +8,92 @@ import Foundation
 import Combine
 
 @MainActor
-final class TestBackendViewModel: ObservableObject {
+final class CandidatesListViewModel: ObservableObject {
     
-    @Published var token: String = ""
+    @Published private(set) var candidates: [Candidate] = []
+    @Published private(set) var isLoading = false
+    @Published private(set) var errorMessage: String?
     
-    private let repository = AuthRepository()
-    private let candidateRepository = CandidateRepository()
+    private let repository: CandidateRepositoryProtocol
+    private let session: SessionViewModel
     
-    func createAccount(candidateDetail: RegisterUserRequestDTO) async {
+    init(repository: CandidateRepositoryProtocol, session: SessionViewModel) {
+        self.repository = repository
+        self.session = session
+    }
+    
+    func fetchCandidates() async {
+        guard let token = session.token else {
+            errorMessage = "User not authenticated"
+            return
+        }
+        
+        isLoading = true
+        errorMessage = nil
+        
+        defer {
+            isLoading = false
+        }
+        
         do {
-            try await repository.createAccount(candidateDetail: candidateDetail)
+            candidates = try await repository.getCandidates(token: token)
             
+        } catch APIError.invalidStatusCode(_, let message) {
+            errorMessage = message ?? "Unable to display the list of candidates"
         } catch {
-            print("Error in account creation: \(error.localizedDescription)")
+            errorMessage = "Unable to display the list of candidates"
         }
     }
     
-    func fetchCandidates(token: String) async {
+    func createCandidate(from formData: CandidateFormData) async {
+        guard let token = session.token else {
+            errorMessage = "User not authenticated"
+            return
+        }
+        
+        isLoading = true
+        errorMessage = nil
+        
+        defer {
+            isLoading = false
+        }
+        
+        let request = formData.toCreateCandidateRequestDTO()
+        
         do {
-            let candidates = try await candidateRepository.fetchCandidates(token: token)
-            print(candidates)
+            let newCandidate = try await repository.createCandidate(candidate: request, token: token)
+            candidates.append(newCandidate)
             
+        } catch APIError.invalidStatusCode(_, let message) {
+            errorMessage = message ?? "Unable to create candidate"
         } catch {
-            print("Error to get the list of candidates: \(error.localizedDescription)")
+            errorMessage = "Unable to create candidate"
         }
     }
     
-    func fetchCandidateDetail(candidateId: UUID, token: String) async {
-        
-        do {
-            let candidateDetail = try await candidateRepository.fetchCandidateDetail(candidateId: candidateId, token: token)
-            print(candidateDetail)
-            
-        } catch {
-            print("Error to get the candidate detail: \(error.localizedDescription)")
+    func deleteCandidate(candidateId: UUID) async {
+        guard let token = session.token else {
+            errorMessage = "User not authenticated"
+            return
         }
         
-    }
-    
-    func addCandidate(candidate: CandidateRequestDTO, token: String) async {
+        isLoading = true
+        errorMessage = nil
         
-        do {
-            let candidateDetail = try await candidateRepository.addCandidate(candidate: candidate, token: token)
-            print(candidateDetail)
-            
-        } catch {
-            print("Error to add candidate: \(error.localizedDescription)")
-        }
-    }
-    
-    func updateCandidate(candidateId: UUID, candidateDetail: CandidateRequestDTO, token: String) async {
-        
-        do {
-            let candidateDetailUpdated = try await candidateRepository.updateCandidate(candidateId: candidateId, candidateDetail: candidateDetail, token: token)
-            print(candidateDetailUpdated)
-            
-        } catch {
-            print("Error to update candidate: \(error.localizedDescription)")
+        defer {
+            isLoading = false
         }
         
-    }
-    
-    func deleteCandidate(candidateId: UUID, token: String) async {
-        
         do {
-            try await candidateRepository.deleteCandidate(candidateId: candidateId, token: token)
+            try await repository.deleteCandidate(candidateId: candidateId, token: token)
+            candidates.removeAll { $0.id == candidateId }
             
+        } catch APIError.invalidStatusCode(_, let message) {
+            errorMessage = message ?? "Unable to delete candidate"
         } catch {
-            print("Error to delete candidate: \(error.localizedDescription)")
+            errorMessage = "Unable to delete candidate"
         }
         
-    }
-
-    func setCandidateFavorite(candidateId: UUID, token: String) async {
-        
-        do {
-            let candidateDetail = try await candidateRepository.setCandidateFavorite(candidateId: candidateId, token: token)
-            print(candidateDetail)
-        } catch {
-            print("Error to set candidate to favorite: \(error.localizedDescription)")
-            
-        }
     }
     
 }

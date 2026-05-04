@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class AuthRepository {
+final class AuthRepository: AuthRepositoryProtocol {
     
     private let apiClient = APIClient()
     
@@ -23,8 +23,8 @@ final class AuthRepository {
         
     }
 
-    func createAccount(candidateDetail: RegisterUserRequestDTO) async throws {
-        let _: EmptyResponse = try await apiClient.performRequest(urlString: "\(baseURL)/register", method: .post, body: candidateDetail, expectedStatusCode: 201)
+    func createAccount(request: RegisterUserRequestDTO) async throws {
+        let _: EmptyResponse = try await apiClient.performRequest(urlString: "\(baseURL)/register", method: .post, body: request, expectedStatusCode: 201)
     }
 
 }

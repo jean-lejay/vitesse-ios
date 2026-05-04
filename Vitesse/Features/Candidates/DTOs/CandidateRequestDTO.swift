@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CreateCandidateRequestDTO: Encodable {
+struct CandidateRequestDTO: Encodable {
     let firstName: String
     let lastName: String
     let email: String

@@ -6,5 +6,3 @@
 //
 
 struct EmptyResponse: Decodable {}
-
-

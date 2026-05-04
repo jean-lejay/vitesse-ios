@@ -37,7 +37,6 @@ struct CandidatesListView: View {
 }
 
 
-    
 #Preview {
     CandidatesListView()
     TestBackendView()

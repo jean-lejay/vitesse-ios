@@ -6,3 +6,20 @@
 //
 
 import Foundation
+import Combine
+
+// gestion du token
+
+@MainActor
+final class SessionViewModel: ObservableObject {
+    
+    @Published private(set) var token: String?
+    
+    func login(with token: String) {
+        self.token = token
+    }
+    
+    func logout() {
+        token = nil
+    }
+}

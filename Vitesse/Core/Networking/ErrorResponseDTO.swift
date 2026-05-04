@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+struct ErrorResponseDTO: Decodable {
+    let error: Bool
+    let reason: String
+}
