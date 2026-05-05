@@ -9,10 +9,13 @@ import Foundation
 
 final class AuthRepository: AuthRepositoryProtocol {
     
-    private let apiClient = APIClient()
-    
+    private let apiClient: APIClientProtocol
     private let baseURL = "http://127.0.0.1:8080/user"
- 
+    
+    init(apiClient: APIClientProtocol) {
+        self.apiClient = apiClient
+    }
+    
     func authenticate(email: String, password: String) async throws -> String {
         
         let authDetails = AuthRequestDTO(email: email, password: password)

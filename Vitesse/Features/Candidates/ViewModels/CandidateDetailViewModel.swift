@@ -9,14 +9,12 @@ import Foundation
 import Combine
 
 @MainActor
-final class CandidateDetailViewModel: ObservableObject {
+final class CandidateDetailViewModel: BaseViewModel {
     
     private let repository: CandidateRepositoryProtocol
     private let session: SessionViewModel
     
     @Published private(set) var candidateDetail: Candidate?
-    @Published private(set) var errorMessage: String?
-    @Published private(set) var isLoading = false
     
     init(repository: CandidateRepositoryProtocol, session: SessionViewModel) {
         self.repository = repository
@@ -39,12 +37,9 @@ final class CandidateDetailViewModel: ObservableObject {
         do {
             candidateDetail = try await repository.getCandidate(id: id, token: token)
             
-        } catch APIError.invalidStatusCode(_, let message) {
-            errorMessage = message ?? "Unable to display the candidate's details"
         } catch {
-            errorMessage = "Unable to display the candidate's details"
+            handleError(error, defaultMessage: "Unable to display the candidate's details")
         }
-        
     }
     
     func updateCandidate(candidateId: UUID, formData: CandidateFormData) async {
@@ -66,12 +61,9 @@ final class CandidateDetailViewModel: ObservableObject {
             let updatedCandidate = try await repository.updateCandidate(candidateId: candidateId, candidateDetail: request, token: token)
             candidateDetail = updatedCandidate
             
-        } catch APIError.invalidStatusCode(_, let message) {
-            errorMessage = message ?? "Unable to log in"
         } catch {
-            errorMessage = "Unable to log in"
+            handleError(error, defaultMessage: "Unable to update candidate")
         }
-        
     }
     
     func setCandidateFavorite(candidateId: UUID) async {
@@ -91,13 +83,10 @@ final class CandidateDetailViewModel: ObservableObject {
             let updatedCandidate = try await repository.setCandidateFavorite(candidateId: candidateId, token: token)
             candidateDetail = updatedCandidate
             
-        } catch APIError.invalidStatusCode(_, let message) {
-            errorMessage = message ?? "Unable to set candidate as favorite"
         } catch {
-            errorMessage = "Unable to set candidate as favorite"
+            handleError(error, defaultMessage: "Unable to set candidate as favorite")
         }
     }
-    
 }
 
 

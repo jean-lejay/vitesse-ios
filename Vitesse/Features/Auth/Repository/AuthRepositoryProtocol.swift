@@ -9,3 +9,4 @@ protocol AuthRepositoryProtocol {
     func authenticate(email: String, password: String) async throws -> String
     func createAccount(request: RegisterUserRequestDTO) async throws
 }
+

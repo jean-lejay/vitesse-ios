@@ -8,11 +8,9 @@ import Foundation
 import Combine
 
 @MainActor
-final class CandidatesListViewModel: ObservableObject {
+final class CandidatesListViewModel: BaseViewModel {
     
     @Published private(set) var candidates: [Candidate] = []
-    @Published private(set) var isLoading = false
-    @Published private(set) var errorMessage: String?
     
     private let repository: CandidateRepositoryProtocol
     private let session: SessionViewModel
@@ -38,10 +36,8 @@ final class CandidatesListViewModel: ObservableObject {
         do {
             candidates = try await repository.getCandidates(token: token)
             
-        } catch APIError.invalidStatusCode(_, let message) {
-            errorMessage = message ?? "Unable to display the list of candidates"
         } catch {
-            errorMessage = "Unable to display the list of candidates"
+            handleError(error, defaultMessage: "Unable to display the list of candidates")
         }
     }
     
@@ -64,10 +60,8 @@ final class CandidatesListViewModel: ObservableObject {
             let newCandidate = try await repository.createCandidate(candidate: request, token: token)
             candidates.append(newCandidate)
             
-        } catch APIError.invalidStatusCode(_, let message) {
-            errorMessage = message ?? "Unable to create candidate"
         } catch {
-            errorMessage = "Unable to create candidate"
+            handleError(error, defaultMessage: "Unable to create candidate")
         }
     }
     
@@ -88,13 +82,9 @@ final class CandidatesListViewModel: ObservableObject {
             try await repository.deleteCandidate(candidateId: candidateId, token: token)
             candidates.removeAll { $0.id == candidateId }
             
-        } catch APIError.invalidStatusCode(_, let message) {
-            errorMessage = message ?? "Unable to delete candidate"
         } catch {
-            errorMessage = "Unable to delete candidate"
+            handleError(error, defaultMessage: "Unable to delete candidate")
         }
-        
     }
-    
 }
 

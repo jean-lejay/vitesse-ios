@@ -9,10 +9,8 @@ import Foundation
 import Combine
 
 @MainActor
-final class RegisterViewModel: ObservableObject {
+final class RegisterViewModel: BaseViewModel {
     
-    @Published private(set) var errorMessage: String?
-    @Published private(set) var isLoading = false
     @Published private(set) var isRegistrationSuccessful = false
     
     private let authRepository: AuthRepositoryProtocol
@@ -33,14 +31,14 @@ final class RegisterViewModel: ObservableObject {
         do {
             let request = formData.toDTO()
             try await authRepository.createAccount(request: request)
+            
             isRegistrationSuccessful = true
             
-        } catch APIError.invalidStatusCode(_, let message) {
-            errorMessage = message ?? "Account creation failed"
         } catch {
-            errorMessage = "Account creation failed"
+            handleError(error, defaultMessage: "Account creation failed")
         }
-        
     }
     
 }
+
+

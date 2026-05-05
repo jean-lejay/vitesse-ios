@@ -9,9 +9,12 @@ import Foundation
 
 final class CandidateRepository {
     
-    private let apiClient = APIClient()
-    
+    private let apiClient: APIClientProtocol
     private let baseURL = "http://127.0.0.1:8080"
+    
+    init(apiClient: APIClientProtocol) {
+        self.apiClient = apiClient
+    }
     
     func getCandidates(token: String) async throws -> [Candidate] {
         

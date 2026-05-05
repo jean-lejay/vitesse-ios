@@ -9,10 +9,7 @@ import Foundation
 import Combine
 
 @MainActor
-final class LoginViewModel: ObservableObject {
-    
-    @Published private(set) var errorMessage: String?
-    @Published private(set) var isLoading = false
+final class LoginViewModel: BaseViewModel {
     
     private let authRepository: AuthRepositoryProtocol
     private let session: SessionViewModel
@@ -24,7 +21,7 @@ final class LoginViewModel: ObservableObject {
     
     func login(email: String, password: String) async {
         isLoading = true
-        errorMessage = nil // reset avant la requête
+        errorMessage = nil
         session.logout()
         
         defer {
@@ -35,13 +32,9 @@ final class LoginViewModel: ObservableObject {
             let token = try await authRepository.authenticate(email: email, password: password)
             session.login(with: token)
             
-        } catch APIError.invalidStatusCode(_, let message) {
-            errorMessage = message ?? "Unable to log in"
         } catch {
-            errorMessage = "Unable to log in"
+            handleError(error, defaultMessage: "Unable to log in")
         }
-        
     }
-
+    
 }
-

@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class APIClient {
+final class APIClient: APIClientProtocol {
     
     func performRequest<Body: Encodable, Response: Decodable>(urlString: String, method: HTTPMethod, token: String? = nil, body: Body? = nil, expectedStatusCode: Int) async throws -> Response {
         
@@ -49,7 +49,6 @@ final class APIClient {
         }
         
         return try JSONDecoder().decode(Response.self, from: data)
-        
     }
 
 }
