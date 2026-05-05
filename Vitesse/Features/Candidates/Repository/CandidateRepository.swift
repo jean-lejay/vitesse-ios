@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class CandidateRepository {
+final class CandidateRepository: CandidateRepositoryProtocol {
     
     private let apiClient: APIClientProtocol
     private let baseURL = "http://127.0.0.1:8080"

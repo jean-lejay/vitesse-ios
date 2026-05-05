@@ -9,9 +9,16 @@ import SwiftUI
 
 @main
 struct VitesseApp: App {
+    
+    // session unique, globale, partagée
+    @StateObject private var session = SessionViewModel()
+    
+    private let dependencies = AppDependencies()
+    
     var body: some Scene {
         WindowGroup {
-            TestBackendView()
+            RootView(dependencies: dependencies)
+                .environmentObject(session)
         }
     }
 }

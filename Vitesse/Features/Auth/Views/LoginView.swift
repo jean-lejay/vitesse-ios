@@ -8,10 +8,19 @@
 import SwiftUI
 
 struct LoginView: View {
+    
+    @EnvironmentObject var session: SessionViewModel
+    @StateObject var viewmodel: LoginViewModel
+    let dependencies: AppDependencies
+    
     @State private var email: String = ""
     @State private var password: String = ""
-    @State private var identifiersCorrect: Bool = false
+    @State private var identifiersCorrect = false
     
+    private var isFormValid: Bool {
+        return !email.isEmpty && !password.isEmpty
+    }
+        
     var body: some View {
         NavigationStack {
             VStack {
@@ -23,10 +32,12 @@ struct LoginView: View {
                         .font(.caption)
                     
                     VStack(alignment: .leading) {
-                        // vérifier le format de l'email
                         Text("Email")
                         TextField("", text: $email)
                             .textFieldStyle(.roundedBorder)
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled(true)
                         
                         Text("Password")
                         SecureField("", text: $password)
@@ -38,23 +49,32 @@ struct LoginView: View {
                                 .font(.caption)
                                 .foregroundStyle(.green)
                         }
+                        
+                        if let errorMessage = viewmodel.errorMessage {
+                            Text(errorMessage)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                                .padding(.top, 8)
+                        }
                     }
                     .padding(.vertical)
                     
                 }
-                
-                // ProgressView
 
                 Button {
-                    identifiersCorrect = true
+                    Task {
+                        await viewmodel.login(email: email, password: password)
+                    }
+                    
                 } label: {
                     Text("Sign in")
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.green)
+                        .background(isFormValid ? Color.green : Color.green.opacity(0.6))
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
+                .disabled(!isFormValid)
                 
                 HStack {
                     Text("Don't have an account?")
@@ -68,9 +88,6 @@ struct LoginView: View {
                 .padding(.vertical)
                 Spacer()
             }
-            .navigationDestination(isPresented: $identifiersCorrect) {
-                CandidatesListView()
-            }
             .padding()
         }
         
@@ -78,5 +95,16 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView()
+    let session = SessionViewModel()
+    let dependencies = AppDependencies()
+    
+    let viewModel = LoginViewModel(authRepository: AuthRepository(apiClient: APIClient()), session: session)
+    
+    LoginView(viewmodel: viewModel, dependencies: dependencies)
+        .environmentObject(session)
 }
+
+// vérifier que le format est bien celui d'un email
+// Griser le bouton tant que ce n'est pas bon
+// afficher les messages d'erreur
+// Progress View

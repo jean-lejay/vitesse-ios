@@ -15,6 +15,10 @@ final class SessionViewModel: ObservableObject {
     
     @Published private(set) var token: String?
     
+    var isAuthenticated: Bool {
+        token != nil
+    }
+    
     func login(with token: String) {
         self.token = token
     }

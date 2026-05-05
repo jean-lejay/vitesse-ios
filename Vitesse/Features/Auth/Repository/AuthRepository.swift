@@ -20,14 +20,14 @@ final class AuthRepository: AuthRepositoryProtocol {
         
         let authDetails = AuthRequestDTO(email: email, password: password)
         
-        let authResponse: AuthResponse = try await apiClient.performRequest(urlString: "\(baseURL)/auth", method: .post, body: authDetails, expectedStatusCode: 200)
+        let authResponse: AuthResponse = try await apiClient.performRequest(urlString: "\(baseURL)/auth", method: .post, token: nil, body: authDetails, expectedStatusCode: 200)
         
         return authResponse.token
         
     }
 
     func createAccount(request: RegisterUserRequestDTO) async throws {
-        let _: EmptyResponse = try await apiClient.performRequest(urlString: "\(baseURL)/register", method: .post, body: request, expectedStatusCode: 201)
+        let _: EmptyResponse = try await apiClient.performRequest(urlString: "\(baseURL)/register", method: .post, token: nil, body: request, expectedStatusCode: 201)
     }
 
 }

@@ -70,7 +70,7 @@ struct RegisterView: View {
                 
             }
             .navigationDestination(isPresented: $credentialsValid) {
-                LoginView()
+                //LoginView()
             }
             .padding()
         }

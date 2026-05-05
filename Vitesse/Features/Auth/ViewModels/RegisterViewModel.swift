@@ -38,7 +38,6 @@ final class RegisterViewModel: BaseViewModel {
             handleError(error, defaultMessage: "Account creation failed")
         }
     }
-    
 }
 
 
