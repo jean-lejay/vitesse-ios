@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LoginHeaderView: View {
+struct AuthHeaderView: View {
     let title: String
     let subtitle: String
     
