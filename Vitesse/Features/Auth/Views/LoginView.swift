@@ -15,82 +15,47 @@ struct LoginView: View {
     
     @State private var email: String = ""
     @State private var password: String = ""
-    @State private var identifiersCorrect = false
+    @FocusState private var emailFocused: Bool
     
     private var isFormValid: Bool {
-        return !email.isEmpty && !password.isEmpty
+        viewmodel.canSubmit(email: email, password: password)
     }
-        
+    
     var body: some View {
         NavigationStack {
             VStack {
                 
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Login")
-                        .font(.title)
-                    Text("Enter your email and password to login")
-                        .font(.caption)
-                    
-                    VStack(alignment: .leading) {
-                        Text("Email")
-                        TextField("", text: $email)
-                            .textFieldStyle(.roundedBorder)
-                            .keyboardType(.emailAddress)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled(true)
+                    LoginHeaderView(title: "Login", subtitle: "Enter your email and password to login")
                         
-                        Text("Password")
-                        SecureField("", text: $password)
-                            .textFieldStyle(.roundedBorder)
-                        
-                        HStack {
-                            Spacer()
-                            Text("Forgot Password?")
-                                .font(.caption)
-                                .foregroundStyle(.green)
+                        LoginFormView(email: $email, password: $password, emailFocused: $emailFocused) {
+                            isFocused in
+                                if isFocused {
+                                    viewmodel.startEditingEmail() // pas de message d'erreur affiché lors de la saisie de l'adresse email
+                                } else if !email.isEmpty {
+                                    viewmodel.validateEmail(email)
+                                }
                         }
-                        
+                        .padding(.top)
+                    
                         if let errorMessage = viewmodel.errorMessage {
-                            Text(errorMessage)
-                                .font(.caption)
-                                .foregroundStyle(.red)
-                                .padding(.top, 8)
+                            ErrorBannerView(message: errorMessage)
                         }
                     }
                     .padding(.vertical)
-                    
-                }
-
-                Button {
+                
+                PrimaryLoadingButton(title: "Sign in", isLoading: viewmodel.isLoading, isEnabled: isFormValid) {
                     Task {
                         await viewmodel.login(email: email, password: password)
                     }
-                    
-                } label: {
-                    Text("Sign in")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(isFormValid ? Color.green : Color.green.opacity(0.6))
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
                 }
-                .disabled(!isFormValid)
                 
-                HStack {
-                    Text("Don't have an account?")
-                    NavigationLink {
-                            RegisterView()
-                        } label: {
-                            Text("Register")
-                                .foregroundStyle(.green)
-                        }
-                }
-                .padding(.vertical)
+                LoginFooterView(dependencies: dependencies)
+                
                 Spacer()
             }
             .padding()
         }
-        
     }
 }
 
@@ -103,8 +68,3 @@ struct LoginView: View {
     LoginView(viewmodel: viewModel, dependencies: dependencies)
         .environmentObject(session)
 }
-
-// vérifier que le format est bien celui d'un email
-// Griser le bouton tant que ce n'est pas bon
-// afficher les messages d'erreur
-// Progress View

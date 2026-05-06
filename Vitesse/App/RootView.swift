@@ -15,7 +15,7 @@ struct RootView: View {
     
     var body: some View {
         if session.isAuthenticated {
-            CandidatesListView()
+            CandidatesListView(viewmodel: CandidatesListViewModel(repository: dependencies.candidateRepository, session: session), dependencies: dependencies)
         } else {
             LoginView(viewmodel: LoginViewModel(authRepository: dependencies.authRepository, session: session), dependencies: dependencies)
         }

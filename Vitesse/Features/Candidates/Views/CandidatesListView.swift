@@ -8,6 +8,11 @@
 import SwiftUI
 
 struct CandidatesListView: View {
+    
+    @EnvironmentObject var session: SessionViewModel
+    @StateObject var viewmodel: CandidatesListViewModel
+    let dependencies: AppDependencies
+    
 //    @State private var searchText = ""
 //    
 //    var filteredCandidates: [Candidate] {
@@ -19,23 +24,26 @@ struct CandidatesListView: View {
 //    }
     
     var body: some View {
-        Text("007 !")
-//        ScrollView {
-//            VStack {
-//                ForEach(filteredCandidates) { candidate in
-//                    HStack {
-//                        Text("\(candidate.firstName) \(candidate.lastName)")
-//                        Spacer()
-//                        Image(systemName: candidate.isFavorite ? "star.fill" : "star")
-//                    }
-//                    .padding()
-//                    .border(.black)
-//                }
-//            }
-//        }
-//        .searchable(text: $searchText)
+        ScrollView {
+            VStack {
+                ForEach(viewmodel.candidates) { candidate in
+                    HStack {
+                        Text("\(candidate.firstName) \(candidate.lastName)")
+                        Spacer()
+                        Image(systemName: candidate.isFavorite ? "star.fill" : "star")
+                    }
+                    .padding()
+                    .border(.black)
+                }
+            }
+        }
+        .task {
+            await viewmodel.fetchCandidates()
+        }
+        //.searchable(text: $searchText)
     }
 }
+
 //
 //
 //#Preview {

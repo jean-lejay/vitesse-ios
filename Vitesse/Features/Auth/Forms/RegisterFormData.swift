@@ -6,10 +6,10 @@
 //
 
 struct RegisterFormData {
-    let firstName: String
-    let lastName: String
-    let email: String
-    let password: String
+    var firstName: String = ""
+    var lastName: String = ""
+    var email: String = ""
+    var password: String = ""
 }
 
 extension RegisterFormData {
