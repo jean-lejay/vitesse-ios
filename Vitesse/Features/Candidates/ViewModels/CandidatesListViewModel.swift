@@ -10,7 +10,8 @@ import Combine
 @MainActor
 final class CandidatesListViewModel: BaseViewModel {
     
-    @Published private(set) var candidates: [Candidate] = []
+    //@Published private(set) var candidates: [Candidate] = []
+    @Published var candidates: [Candidate] = []
     
     private let repository: CandidateRepositoryProtocol
     private let session: SessionViewModel

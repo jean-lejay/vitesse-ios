@@ -35,8 +35,6 @@ final class LoginViewModel: BaseViewModel {
         }
         
         do {
-            try await Task.sleep(nanoseconds: 1_500_000_000)
-            
             let token = try await authRepository.authenticate(email: email, password: password)
             session.login(with: token)
             
@@ -45,21 +43,7 @@ final class LoginViewModel: BaseViewModel {
         }
     }
     
-    private func isEmailValid(_ email: String) -> Bool {
-        let regex = /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/
-        return email.wholeMatch(of: regex) != nil
-    }
-    
-    func startEditingEmail() {
-        errorMessage = nil
-    }
-    
-    func validateEmail(_ email: String) {
-        if !isEmailValid(email) {
-            errorMessage = "Please enter a valid email address"
-        }
-    }
-    
+    // les identifiants sont renseignés et le format de l'adresse email est valide
     func canSubmit(email: String, password: String) -> Bool {
         isEmailValid(email) && !password.isEmpty
     }

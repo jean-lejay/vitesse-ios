@@ -11,60 +11,46 @@ struct RegisterView: View {
     
     @StateObject var viewmodel: RegisterViewModel
     @State private var formData = RegisterFormData()
-    @State private var passwordConfirmation: String = ""
+    @State private var confirmPassword: String = ""
+    
+    @FocusState private var focusedField: RegisterFormView.Field?
     
     @Environment(\.dismiss) private var dismiss
+    
+    private var isFormValid: Bool {
+        viewmodel.canSubmit(formData: formData, confirmPassword: confirmPassword)
+    }
     
     var body: some View {
         VStack {
             
             VStack(alignment: .leading) {
                 
-                VStack(alignment: .leading, spacing: 16){
-                    Text("Register")
-                        .font(.title)
-                    Text("Create Your Vitesse account")
-                        .font(.caption)
-                }
+                AuthHeaderView(title: "Register", subtitle: "Create Your Vitesse account")
                 
-                VStack(alignment: .leading) {
+                RegisterFormView(formData: $formData, confirmPassword: $confirmPassword, focusedField: $focusedField, errorMessage: viewmodel.errorMessage) { oldFocusedField, newFocusedField in
                     
-                    Text("First Name")
-                    TextField("", text: $formData.firstName)
-                        .textFieldStyle(.roundedBorder)
+                    if newFocusedField == .email {
+                        viewmodel.startEditingEmail()
+                    } else if oldFocusedField == .email, !formData.email.isEmpty {
+                        viewmodel.validateEmail(formData.email)
+                    }
                     
-                    Text("Last Name")
-                    TextField("", text: $formData.lastName)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    Text("Email")
-                    TextField("", text: $formData.email)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    Text("Password")
-                    SecureField("", text: $formData.password)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    Text("Confirm Password")
-                    SecureField("", text: $passwordConfirmation)
-                        .textFieldStyle(.roundedBorder)
-                    
+                    if (oldFocusedField == .password || oldFocusedField == .confirmPassword) &&
+                        newFocusedField != .password &&
+                        newFocusedField != .confirmPassword {
+                        viewmodel.validatePasswords(
+                            password: formData.password,
+                            confirmPassword: confirmPassword
+                        )
+                    }
                 }
-                .padding(.vertical)
-                
             }
             
-            Button {
+            PrimaryLoadingButton(title: "Create", isLoading: viewmodel.isLoading, isEnabled: isFormValid) {
                 Task {
-                    await viewmodel.register(formData: formData)
+                    await viewmodel.register(formData: formData, confirmPassword: confirmPassword)
                 }
-            } label: {
-                Text("Create")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
             }
             
             Spacer()
@@ -78,7 +64,3 @@ struct RegisterView: View {
         .padding()
     }
 }
-
-//#Preview {
-//    RegisterView()
-//}

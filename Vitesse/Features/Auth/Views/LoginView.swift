@@ -26,23 +26,23 @@ struct LoginView: View {
             VStack {
                 
                 VStack(alignment: .leading, spacing: 16) {
-                    LoginHeaderView(title: "Login", subtitle: "Enter your email and password to login")
-                        
-                        LoginFormView(email: $email, password: $password, emailFocused: $emailFocused) {
-                            isFocused in
-                                if isFocused {
-                                    viewmodel.startEditingEmail() // pas de message d'erreur affiché lors de la saisie de l'adresse email
-                                } else if !email.isEmpty {
-                                    viewmodel.validateEmail(email)
-                                }
-                        }
-                        .padding(.top)
+                    AuthHeaderView(title: "Login", subtitle: "Enter your email and password to login")
                     
-                        if let errorMessage = viewmodel.errorMessage {
-                            ErrorBannerView(message: errorMessage)
+                    LoginFormView(email: $email, password: $password, emailFocused: $emailFocused) {
+                        isFocused in
+                        if isFocused {
+                            viewmodel.startEditingEmail() // pas de message d'erreur affiché lors de la saisie de l'adresse email
+                        } else if !email.isEmpty {
+                            viewmodel.validateEmail(email)
                         }
                     }
-                    .padding(.vertical)
+                    .padding(.top)
+                    
+                    if let errorMessage = viewmodel.errorMessage {
+                        ErrorBannerView(message: errorMessage)
+                    }
+                }
+                .padding(.vertical)
                 
                 PrimaryLoadingButton(title: "Sign in", isLoading: viewmodel.isLoading, isEnabled: isFormValid) {
                     Task {

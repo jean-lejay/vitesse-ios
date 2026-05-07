@@ -8,11 +8,58 @@
 import SwiftUI
 
 struct RegisterFormView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+    
+    enum Field: Equatable {
+        case email
+        case password
+        case confirmPassword
     }
-}
-
-#Preview {
-    RegisterFormView()
+    
+    @Binding var formData: RegisterFormData
+    @Binding var confirmPassword: String
+    
+    @FocusState.Binding var focusedField: Field?
+    
+    let errorMessage: String?
+    let onFocusChanged: (Field?, Field?) -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            
+            Text("First Name")
+            TextField("", text: $formData.firstName)
+                .textFieldStyle(.roundedBorder)
+            
+            Text("Last Name")
+            TextField("", text: $formData.lastName)
+                .textFieldStyle(.roundedBorder)
+            
+            Text("Email")
+            TextField("", text: $formData.email)
+                .textFieldStyle(.roundedBorder)
+                .keyboardType(.emailAddress)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled(true)
+                .focused($focusedField, equals: .email)
+            
+            Text("Password")
+            SecureField("", text: $formData.password)
+                .textFieldStyle(.roundedBorder)
+                .focused($focusedField, equals: .password)
+            
+            Text("Confirm Password")
+            SecureField("", text: $confirmPassword)
+                .textFieldStyle(.roundedBorder)
+                .focused($focusedField, equals: .confirmPassword)
+            
+            if let errorMessage = errorMessage {
+                ErrorBannerView(message: errorMessage)
+            }
+            
+        }
+        .padding(.vertical)
+        .onChange(of: focusedField) { oldFocusedField, newFocusedField in
+            onFocusChanged(oldFocusedField, newFocusedField)
+        }
+    }
 }

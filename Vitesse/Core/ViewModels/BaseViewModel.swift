@@ -22,4 +22,21 @@ class BaseViewModel: ObservableObject {
             errorMessage = defaultMessage
         }
     }
+    
+    // Pour les vues Login et Register
+    
+    func isEmailValid(_ email: String) -> Bool {
+        let regex = /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/
+        return email.wholeMatch(of: regex) != nil
+    }
+    
+    func startEditingEmail() {
+        errorMessage = nil
+    }
+    
+    func validateEmail(_ email: String) {
+        if !isEmailValid(email) {
+            errorMessage = "Please enter a valid email address"
+        }
+    }
 }

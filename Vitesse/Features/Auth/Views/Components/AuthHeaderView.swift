@@ -1,5 +1,5 @@
 //
-//  LoginHeaderView.swift
+//  AuthHeaderView.swift
 //  Vitesse
 //
 //  Created by Jean Lejay on 5/6/26.

@@ -19,7 +19,18 @@ final class RegisterViewModel: BaseViewModel {
         self.authRepository = authRepository
     }
  
-    func register(formData: RegisterFormData) async {
+    func register(formData: RegisterFormData, confirmPassword: String) async {
+        
+        guard isEmailValid(formData.email) else {
+            errorMessage = "Please enter a valid email address"
+            return
+        }
+        
+        guard formData.password == confirmPassword else {
+            errorMessage = "Passwords do not match"
+            return
+        }
+        
         isLoading = true
         errorMessage = nil
         isRegistrationSuccessful = false
@@ -37,6 +48,27 @@ final class RegisterViewModel: BaseViewModel {
         } catch {
             handleError(error, defaultMessage: "Account creation failed")
         }
+    }
+    
+    func validatePasswords(password: String, confirmPassword: String) {
+        guard !password.isEmpty, !confirmPassword.isEmpty else {
+            return
+        }
+        
+        if password != confirmPassword {
+            errorMessage = "Passwords do not match"
+        } else {
+            errorMessage = nil
+        }
+    }
+    
+    // tous les champs du formulaire sont renseignés, le format de l'adresse email est valide et les deux mots de passe sont identiques
+    func canSubmit(formData: RegisterFormData, confirmPassword: String) -> Bool {
+        !formData.firstName.isEmpty &&
+        !formData.lastName.isEmpty &&
+        isEmailValid(formData.email) &&
+        !formData.password.isEmpty &&
+        formData.password == confirmPassword
     }
 }
 
