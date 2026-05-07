@@ -87,5 +87,11 @@ final class CandidatesListViewModel: BaseViewModel {
             handleError(error, defaultMessage: "Unable to delete candidate")
         }
     }
+    
+    func deleteCandidates(candidateIds: Set<UUID>) async {
+        for candidateId in candidateIds {
+            await deleteCandidate(candidateId: candidateId)
+        }
+    }
 }
 

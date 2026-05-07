@@ -67,8 +67,7 @@ final class RegisterViewModel: BaseViewModel {
         !formData.firstName.isEmpty &&
         !formData.lastName.isEmpty &&
         isEmailValid(formData.email) &&
-        !formData.password.isEmpty &&
-        formData.password == confirmPassword
+        !formData.password.isEmpty
     }
 }
 

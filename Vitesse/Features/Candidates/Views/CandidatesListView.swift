@@ -37,9 +37,7 @@ struct CandidatesListView: View {
                 VStack {
                     CandidatesListToolbarView(showFavoritesOnly: $showFavoritesOnly, isEditing: $isEditing, selectedCandidateIds: $selectedCandidateIds) {
                         Task {
-                            for candidateId in selectedCandidateIds {
-                                await viewmodel.deleteCandidate(candidateId: candidateId)
-                            }
+                            await viewmodel.deleteCandidates(candidateIds: selectedCandidateIds)
                             selectedCandidateIds.removeAll()
                             isEditing = false
                         }
