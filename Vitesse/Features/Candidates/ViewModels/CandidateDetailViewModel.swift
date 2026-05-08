@@ -48,6 +48,16 @@ final class CandidateDetailViewModel: BaseViewModel {
             return
         }
         
+        guard isEmailValid(formData.email) else {
+            errorMessage = "Please enter a valid email address"
+            return
+        }
+        
+        guard formData.linkedinURL.isEmpty || isLinkedInURLValid(formData.linkedinURL) else {
+            errorMessage = "Please enter a valid LinkedIn URL"
+            return
+        }
+        
         isLoading = true
         errorMessage = nil
         
@@ -86,6 +96,35 @@ final class CandidateDetailViewModel: BaseViewModel {
         } catch {
             handleError(error, defaultMessage: "Unable to set candidate as favorite")
         }
+    }
+    
+    func clearError() {
+        errorMessage = nil
+    }
+    
+    private func isLinkedInURLValid(_ url: String) -> Bool {
+        guard let components = URLComponents(string: url),
+              let scheme = components.scheme,
+              let host = components.host else {
+            return false
+        }
+        
+        return ["http", "https"].contains(scheme.lowercased())
+            && host.lowercased().contains("linkedin.com")
+    }
+    
+    func validateLinkedInURL(_ url: String) {
+        guard !url.isEmpty else {
+            errorMessage = nil
+            return
+        }
+        
+        guard isLinkedInURLValid(url) else {
+            errorMessage = "Please enter a valid LinkedIn URL"
+            return
+        }
+        
+        errorMessage = nil
     }
 }
 

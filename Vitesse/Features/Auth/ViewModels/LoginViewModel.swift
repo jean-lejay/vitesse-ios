@@ -35,8 +35,8 @@ final class LoginViewModel: BaseViewModel {
         }
         
         do {
-            let token = try await authRepository.authenticate(email: email, password: password)
-            session.login(with: token)
+            let authresponse = try await authRepository.authenticate(email: email, password: password)
+            session.login(token: authresponse.token, isAdmin: authresponse.isAdmin)
             
         } catch {
             handleError(error, defaultMessage: "Unable to log in")

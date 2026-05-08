@@ -16,6 +16,9 @@ struct CandidatesListContentView: View {
     @Binding var isEditing: Bool
     @Binding var selectedCandidateIds: Set<UUID>
     
+    let dependencies: AppDependencies
+    let session: SessionViewModel
+    
     var body: some View {
         if let errorMessage {
             ErrorBannerView(message: errorMessage)
@@ -29,7 +32,18 @@ struct CandidatesListContentView: View {
             .padding(.top, 24)
         } else {
             ForEach(candidates) { candidate in
-                CandidateRowView(candidate: candidate, isEditing: $isEditing, selectedCandidateIds: $selectedCandidateIds)
+                
+                if isEditing {
+                    CandidateRowView(candidate: candidate, isEditing: $isEditing, selectedCandidateIds: $selectedCandidateIds)
+                } else {
+                    NavigationLink {
+                        CandidateDetailView(viewmodel: CandidateDetailViewModel(repository: dependencies.candidateRepository, session: session), isAdmin: session.isAdmin, candidate: candidate)
+                    } label: {
+                        CandidateRowView(candidate: candidate, isEditing: $isEditing, selectedCandidateIds: $selectedCandidateIds)
+                    }
+                    .buttonStyle(.plain)
+                }
+                
             }
         }
     }

@@ -45,7 +45,7 @@ struct CandidatesListView: View {
                     
                     CandidateSearchBarView(searchText: $searchText)
                     
-                    CandidatesListContentView(candidates: filteredCandidates, errorMessage: viewmodel.errorMessage, isLoading: viewmodel.isLoading, isEditing: $isEditing, selectedCandidateIds: $selectedCandidateIds)
+                    CandidatesListContentView(candidates: filteredCandidates, errorMessage: viewmodel.errorMessage, isLoading: viewmodel.isLoading, isEditing: $isEditing, selectedCandidateIds: $selectedCandidateIds, dependencies: dependencies, session: session)
                 }
                 .padding()
             }

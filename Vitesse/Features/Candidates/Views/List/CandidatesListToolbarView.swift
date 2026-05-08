@@ -16,27 +16,27 @@ struct CandidatesListToolbarView: View {
     let onDelete: () -> Void
     
     var body: some View {
-        
-        if isEditing {
-            HStack {
+        HStack {
+            if isEditing {
                 Button("Cancel") {
                     isEditing = false
                     selectedCandidateIds.removeAll()
                 }
-                Spacer()
+            } else {
+                Button("Edit") {
+                    isEditing = true
+                }
+            }
+            
+            Spacer()
+            
+            if isEditing {
                 Button("Delete") {
                     onDelete()
                 }
                 .foregroundStyle(.red)
                 .disabled(selectedCandidateIds.isEmpty)
-            }
-            .frame(height: 30)
-        } else {
-            HStack {
-                Button("Edit") {
-                    isEditing = true
-                }
-                Spacer()
+            } else {
                 Button {
                     showFavoritesOnly.toggle()
                 } label: {
@@ -46,7 +46,7 @@ struct CandidatesListToolbarView: View {
                 }
                 .padding(.trailing,13)
             }
-            .frame(height: 30)
         }
+        .frame(height: 30)
     }
 }

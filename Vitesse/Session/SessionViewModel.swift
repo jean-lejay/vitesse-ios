@@ -14,16 +14,19 @@ import Combine
 final class SessionViewModel: ObservableObject {
     
     @Published private(set) var token: String?
+    @Published private(set) var isAdmin = false
     
     var isAuthenticated: Bool {
         token != nil
     }
     
-    func login(with token: String) {
+    func login(token: String, isAdmin: Bool) {
         self.token = token
+        self.isAdmin = isAdmin
     }
     
     func logout() {
         token = nil
+        isAdmin = false
     }
 }

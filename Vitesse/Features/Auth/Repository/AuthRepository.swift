@@ -16,13 +16,13 @@ final class AuthRepository: AuthRepositoryProtocol {
         self.apiClient = apiClient
     }
     
-    func authenticate(email: String, password: String) async throws -> String {
+    func authenticate(email: String, password: String) async throws -> AuthResponse {
         
         let authDetails = AuthRequestDTO(email: email, password: password)
         
         let authResponse: AuthResponse = try await apiClient.performRequest(urlString: "\(baseURL)/auth", method: .post, token: nil, body: authDetails, expectedStatusCode: 200)
         
-        return authResponse.token
+        return authResponse
         
     }
 

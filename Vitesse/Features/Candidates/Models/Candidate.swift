@@ -18,6 +18,19 @@ struct Candidate: Identifiable {
     var isFavorite: Bool
 }
 
+extension Candidate {
+    func toFormData() -> CandidateFormData {
+        CandidateFormData(
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            phone: phone ?? "",
+            linkedinURL: linkedinURL ?? "",
+            note: note ?? ""
+        )
+    }
+}
+
 //var candidates: [Candidate] = [
 //    Candidate(
 //        firstName: "Jean",

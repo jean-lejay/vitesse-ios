@@ -8,20 +8,25 @@
 import Foundation
 
 struct CandidateFormData {
-    let firstName: String
-    let lastName: String
-    let email: String
-    let phone: String?
-    let linkedinURL: String?
-    let note: String?
+    var firstName: String
+    var lastName: String
+    var email: String
+    var phone: String
+    var linkedinURL: String
+    var note: String
 }
 
 extension CandidateFormData {
+    
+    private func emptyToNil(_ value: String) -> String? {
+            value.isEmpty ? nil : value
+    }
+    
     func toCreateCandidateRequestDTO() -> CandidateRequestDTO {
-        CandidateRequestDTO(firstName: firstName, lastName: lastName, email: email, phone: phone, linkedinURL: linkedinURL, note: note)
+        CandidateRequestDTO(firstName: firstName, lastName: lastName, email: email, phone: emptyToNil(phone), linkedinURL: emptyToNil(linkedinURL), note: emptyToNil(note))
     }
     
     func toUpdateCandidateRequestDTO() -> CandidateRequestDTO {
-        CandidateRequestDTO(firstName: firstName, lastName: lastName, email: email, phone: phone, linkedinURL: linkedinURL, note: note)
+        CandidateRequestDTO(firstName: firstName, lastName: lastName, email: email, phone: emptyToNil(phone), linkedinURL: emptyToNil(linkedinURL), note: emptyToNil(note))
     }
 }
