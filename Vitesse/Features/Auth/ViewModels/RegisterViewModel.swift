@@ -62,7 +62,7 @@ final class RegisterViewModel: BaseViewModel {
         }
     }
     
-    // tous les champs du formulaire sont renseignés, le format de l'adresse email est valide et les deux mots de passe sont identiques
+    // tous les champs du formulaire sont renseignés et le format de l'adresse email est valide
     func canSubmit(formData: RegisterFormData, confirmPassword: String) -> Bool {
         !formData.firstName.isEmpty &&
         !formData.lastName.isEmpty &&
