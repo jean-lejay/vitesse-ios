@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "D4BC6821-DD8C-472E-88D4-C9B0C12577B7",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Vitesse.xcodeproj",
+        "identifier" : "ED5ABCEC2F867BC400E318D5",
+        "name" : "VitesseTests"
+      }
+    }
+  ],
+  "version" : 1
+}
