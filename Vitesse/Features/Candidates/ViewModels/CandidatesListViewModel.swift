@@ -11,9 +11,24 @@ import Combine
 final class CandidatesListViewModel: BaseViewModel {
     
     @Published var candidates: [Candidate] = []
+    @Published var searchText = ""
+    @Published var showFavoritesOnly = false
     
     private let repository: CandidateRepositoryProtocol
     private let session: SessionViewModel
+    
+    var filteredCandidates: [Candidate] {
+        candidates.filter { candidate in
+            let matchesSearch =
+            searchText.isEmpty ||
+            candidate.firstName.localizedCaseInsensitiveContains(searchText) ||
+            candidate.lastName.localizedCaseInsensitiveContains(searchText)
+            
+            let matchesFavorite = !showFavoritesOnly || candidate.isFavorite
+            
+            return matchesSearch && matchesFavorite
+        }
+    }
     
     init(repository: CandidateRepositoryProtocol, session: SessionViewModel) {
         self.repository = repository

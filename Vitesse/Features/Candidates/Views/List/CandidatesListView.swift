@@ -13,29 +13,14 @@ struct CandidatesListView: View {
     @StateObject var viewmodel: CandidatesListViewModel
     let dependencies: AppDependencies
     
-    @State private var searchText = ""
-    @State private var showFavoritesOnly = false
     @State private var isEditing = false
     @State private var selectedCandidateIds: Set<UUID> = []
-    
-    private var filteredCandidates: [Candidate] {
-        viewmodel.candidates.filter { candidate in
-            let matchesSearch =
-            searchText.isEmpty ||
-            candidate.firstName.localizedCaseInsensitiveContains(searchText) ||
-            candidate.lastName.localizedCaseInsensitiveContains(searchText)
-            
-            let matchesFavorite = !showFavoritesOnly || candidate.isFavorite
-            
-            return matchesSearch && matchesFavorite
-        }
-    }
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack {
-                    CandidatesListToolbarView(showFavoritesOnly: $showFavoritesOnly, isEditing: $isEditing, selectedCandidateIds: $selectedCandidateIds) {
+                    CandidatesListToolbarView(showFavoritesOnly: $viewmodel.showFavoritesOnly, isEditing: $isEditing, selectedCandidateIds: $selectedCandidateIds) {
                         Task {
                             await viewmodel.deleteCandidates(candidateIds: selectedCandidateIds)
                             selectedCandidateIds.removeAll()
@@ -43,9 +28,9 @@ struct CandidatesListView: View {
                         }
                     }
                     
-                    CandidateSearchBarView(searchText: $searchText)
+                    CandidateSearchBarView(searchText: $viewmodel.searchText)
                     
-                    CandidatesListContentView(candidates: filteredCandidates, errorMessage: viewmodel.errorMessage, isLoading: viewmodel.isLoading, isEditing: $isEditing, selectedCandidateIds: $selectedCandidateIds, dependencies: dependencies, session: session)
+                    CandidatesListContentView(candidates: viewmodel.filteredCandidates, errorMessage: viewmodel.errorMessage, isLoading: viewmodel.isLoading, isEditing: $isEditing, selectedCandidateIds: $selectedCandidateIds, dependencies: dependencies, session: session)
                 }
                 .padding()
             }

@@ -8,12 +8,13 @@
 import XCTest
 @testable import Vitesse
 
+@MainActor
 final class AuthRepositoryTests: XCTestCase {
     
     // MARK: - authenticate
     
     // success : authenticate returns AuthResponse
-    @MainActor
+    
     func test_authenticate_returnsAuthResponse() async throws {
         let apiClient = MockAPIClient()
         apiClient.result = AuthResponse(
@@ -38,7 +39,7 @@ final class AuthRepositoryTests: XCTestCase {
         
         apiClient.error = APIError.invalidStatusCode(401, message: "Invalid credentials")
         
-        let repository = await AuthRepository(apiClient: apiClient)
+        let repository = AuthRepository(apiClient: apiClient)
         
         do {
             _ = try await repository.authenticate(
@@ -55,9 +56,9 @@ final class AuthRepositoryTests: XCTestCase {
     
     func test_createAccount_succeeds_whenAPIClientSucceeds() async throws {
         let apiClient = MockAPIClient()
-        apiClient.result = await EmptyResponse()
+        apiClient.result = EmptyResponse()
         
-        let repository = await AuthRepository(apiClient: apiClient)
+        let repository = AuthRepository(apiClient: apiClient)
         
         let request = RegisterUserRequestDTO(firstName: "John", lastName: "Lejeune", email: "test@example.com", password: "password")
         
@@ -69,7 +70,7 @@ final class AuthRepositoryTests: XCTestCase {
         
         apiClient.error = APIError.invalidStatusCode(500, message: "UNIQUE constraint failed: users.email")
         
-        let repository = await AuthRepository(apiClient: apiClient)
+        let repository = AuthRepository(apiClient: apiClient)
         
         let request = RegisterUserRequestDTO(firstName: "John", lastName: "Lejeune", email: "test@example.com", password: "password")
         

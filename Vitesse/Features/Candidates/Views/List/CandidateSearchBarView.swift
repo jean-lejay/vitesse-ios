@@ -17,6 +17,8 @@ struct CandidateSearchBarView: View {
                 .foregroundStyle(.gray)
             
             TextField("Search", text: $searchText)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
