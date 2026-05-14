@@ -104,20 +104,10 @@ final class CandidatesListViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.candidates.first?.firstName, "Alice")
     }
     
-    // deleteCandidate success
-    func test_deleteCandidate_removesCandidate_whenRepositorySucceeds() async {
+    // createCandidate repository failure
+    func test_createCandidate_setsErrorMessage_whenRepositoryFails() async {
         let repository = MockCandidateRepository()
-        
-        let candidate = Candidate(
-            id: UUID(),
-            firstName: "Alice",
-            lastName: "Martin",
-            email: "alice@example.com",
-            phone: nil,
-            linkedinURL: nil,
-            note: nil,
-            isFavorite: false
-        )
+        repository.error = APIError.invalidStatusCode(500, message: "Server error")
         
         let session = SessionViewModel()
         session.login(token: "fake-token", isAdmin: true)
@@ -127,11 +117,19 @@ final class CandidatesListViewModelTests: XCTestCase {
             session: session
         )
         
-        viewModel.candidates = [candidate]
+        let formData = CandidateFormData(
+            firstName: "Alice",
+            lastName: "Martin",
+            email: "alice@example.com",
+            phone: "",
+            linkedinURL: "",
+            note: "",
+        )
         
-        await viewModel.deleteCandidate(candidateId: candidate.id)
+        await viewModel.createCandidate(from: formData)
         
         XCTAssertTrue(viewModel.candidates.isEmpty)
+        XCTAssertEqual(viewModel.errorMessage, "Server error")
     }
     
     // deleteCandidates success
@@ -162,4 +160,35 @@ final class CandidatesListViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.candidates.first?.id, candidate2.id)
     }
     
+
+    // deleteCandidates partial failure
+    
+    func test_deleteCandidates_keepsFailedCandidate_whenDeletionFails() async {
+        let repository = MockCandidateRepository()
+        
+        let candidate1 = Candidate(id: UUID(), firstName: "Alice", lastName: "Martin", email: "alice@example.com", phone: nil, linkedinURL: nil, note: nil, isFavorite: false)
+        let candidate2 = Candidate(id: UUID(), firstName: "Bob", lastName: "Durand", email: "bob@example.com", phone: nil, linkedinURL: nil, note: nil, isFavorite: false)
+        let candidate3 = Candidate(id: UUID(), firstName: "Claire", lastName: "Petit", email: "claire@example.com", phone: nil, linkedinURL: nil, note: nil, isFavorite: false)
+        
+        repository.candidateIdsThatShouldFail = [candidate2.id]
+        
+        let session = SessionViewModel()
+        session.login(token: "fake-token", isAdmin: true)
+        
+        let viewModel = CandidatesListViewModel(
+            repository: repository,
+            session: session
+        )
+        
+        viewModel.candidates = [candidate1, candidate2, candidate3]
+        
+        await viewModel.deleteCandidates(candidateIds: [
+            candidate1.id,
+            candidate2.id,
+            candidate3.id
+        ])
+        
+        XCTAssertTrue(viewModel.candidates.contains { $0.id == candidate2.id })
+        XCTAssertNotNil(viewModel.errorMessage)
+    }
 }

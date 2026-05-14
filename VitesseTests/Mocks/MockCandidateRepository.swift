@@ -12,6 +12,7 @@ final class MockCandidateRepository: CandidateRepositoryProtocol {
     
     var candidates: [Candidate] = []
     var candidateToReturn: Candidate?
+    var candidateIdsThatShouldFail: Set<UUID> = []
     var error: Error?
     
     func getCandidates(token: String) async throws -> [Candidate] {
@@ -44,7 +45,9 @@ final class MockCandidateRepository: CandidateRepositoryProtocol {
     }
     
     func deleteCandidate(candidateId: UUID, token: String) async throws {
-        if let error { throw error }
+        if candidateIdsThatShouldFail.contains(candidateId) {
+                throw APIError.invalidStatusCode(500, message: "Unable to delete candidate")
+            }
     }
     
     func setCandidateFavorite(candidateId: UUID, token: String) async throws -> Candidate {

@@ -80,7 +80,8 @@ final class CandidatesListViewModel: BaseViewModel {
         }
     }
     
-    func deleteCandidate(candidateId: UUID) async {
+    func deleteCandidates(candidateIds: Set<UUID>) async {
+        
         guard let token = session.token else {
             errorMessage = "User not authenticated"
             return
@@ -94,17 +95,12 @@ final class CandidatesListViewModel: BaseViewModel {
         }
         
         do {
-            try await repository.deleteCandidate(candidateId: candidateId, token: token)
-            candidates.removeAll { $0.id == candidateId }
-            
+            for candidateId in candidateIds {
+                try await repository.deleteCandidate(candidateId: candidateId, token: token)
+                candidates.removeAll { $0.id == candidateId }
+            }
         } catch {
-            handleError(error, defaultMessage: "Unable to delete candidate")
-        }
-    }
-    
-    func deleteCandidates(candidateIds: Set<UUID>) async {
-        for candidateId in candidateIds {
-            await deleteCandidate(candidateId: candidateId)
+            handleError(error, defaultMessage: "Some candidates could not be deleted")
         }
     }
 }
